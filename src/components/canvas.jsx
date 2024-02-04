@@ -20,15 +20,9 @@ function CanvasArea() {
   const isDrawing = useRef(false);
 
   const handleResize = () => {
-    const maxWidth = 800; // Set your maximum width here
-    const maxHeight = 600; // Set your maximum height here
-    const newWidth = Math.min(window.innerWidth, maxWidth);
-    const newHeight = Math.min(window.innerHeight, maxHeight);
-    setStageWidth(newWidth);
-    setStageHeight(newHeight);
-   };
-   
-  
+    setStageWidth(window.innerWidth);
+    setStageHeight(window.innerHeight);
+  };
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -40,7 +34,7 @@ function CanvasArea() {
   const handleMouseDown = (e) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool: 'pencil', points: [pos.x, pos.y], color }]);
+    setLines([...lines, { tool: "pencil", points: [pos.x, pos.y], color }]);
   };
 
   const handleMouseMove = (e) => {
@@ -107,6 +101,9 @@ function CanvasArea() {
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
       >
         <Layer>
           {lines.map((line, i) => (
@@ -118,7 +115,7 @@ function CanvasArea() {
               tension={0.5}
               lineCap="round"
               globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                line.tool === "eraser" ? "destination-out" : "source-over"
               }
             />
           ))}
