@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Editor, EditorState } from "draft-js";
 import { SketchPicker } from "react-color";
-import { Stage, Layer, Circle } from "react-konva";
-
+import { Stage, Layer, Line } from "react-konva";
 
 import circle from "../assets/circle.svg";
 import colour from "../assets/color.svg";
@@ -17,7 +16,8 @@ function CanvasArea() {
   const [stageHeight, setStageHeight] = useState(window.innerHeight);
   const [color, setColor] = useState("#000000");
   const [showColor, setShowColor] = useState(false);
-  const [circles, setCircles] = useState([]);
+  const [lines, setLines] = useState([]);
+  const isDrawing = useRef(false);
 
   const handleResize = () => {
     setStageWidth(window.innerWidth);
@@ -31,18 +31,27 @@ function CanvasArea() {
     };
   }, []);
 
-  const clearCanvas = () => {
-    setCircles([]);
+  const handleMouseDown = (e) => {
+    isDrawing.current = true;
+    const pos = e.target.getStage().getPointerPosition();
+    setLines([...lines, { tool: 'pencil', points: [pos.x, pos.y], color }]);
   };
 
-  const drawCircle = () => {
-    const newCircle = {
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      radius: 50,
-      color: '#000000',
-    };
-    setCircles([...circles, newCircle]);
+  const handleMouseMove = (e) => {
+    if (!isDrawing.current) {
+      return;
+    }
+    const stage = e.target.getStage();
+    const point = stage.getPointerPosition();
+    let lastLine = lines[lines.length - 1];
+    lastLine.points = lastLine.points.concat([point.x, point.y]);
+
+    lines.splice(lines.length - 1, 1, lastLine);
+    setLines(lines.concat());
+  };
+
+  const handleMouseUp = () => {
+    isDrawing.current = false;
   };
 
   return (
@@ -50,13 +59,7 @@ function CanvasArea() {
       <div className="flex flex-row justify-between gap-14">
         <button
           className="btn btn-ghost text-white font-bold rounded"
-          onClick={drawCircle}
-        >
-          <img src={circle} alt="draw circle" className="h-12 w-12 p-1" />
-        </button>
-        <button
-          className="btn btn-ghost text-white font-bold rounded"
-          onClick={clearCanvas}
+          onClick={() => setLines([])}
         >
           <img src={eraser} alt="draw circle" className="h-12 w-12 p-1" />
         </button>
@@ -92,15 +95,25 @@ function CanvasArea() {
         className="mt-4 p-2 border border-gray-300"
       />
 
-      <Stage width={stageWidth} height={stageHeight}>
+      <Stage
+        width={stageWidth}
+        height={stageHeight}
+        onMouseDown={handleMouseDown}
+        onMousemove={handleMouseMove}
+        onMouseup={handleMouseUp}
+      >
         <Layer>
-          {circles.map((circle, i) => (
-            <Circle
+          {lines.map((line, i) => (
+            <Line
               key={i}
-              x={Math.random() * stageWidth}
-              y={Math.random() * stageHeight}
-              radius={50}
-              fill={circle.color}
+              points={line.points}
+              stroke={line.color}
+              strokeWidth={5}
+              tension={0.5}
+              lineCap="round"
+              globalCompositeOperation={
+                line.tool === 'eraser' ? 'destination-out' : 'source-over'
+              }
             />
           ))}
         </Layer>
