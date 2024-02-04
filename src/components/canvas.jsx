@@ -20,9 +20,14 @@ function CanvasArea() {
   const isDrawing = useRef(false);
 
   const handleResize = () => {
-    setStageWidth(window.innerWidth );
-    setStageHeight(window.innerHeight - 50); 
-  }
+    const maxWidth = 800; // Set your maximum width here
+    const maxHeight = 600; // Set your maximum height here
+    const newWidth = Math.min(window.innerWidth, maxWidth);
+    const newHeight = Math.min(window.innerHeight, maxHeight);
+    setStageWidth(newWidth);
+    setStageHeight(newHeight);
+   };
+   
   
 
   useEffect(() => {
@@ -56,7 +61,7 @@ function CanvasArea() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen fixed">
       <div className="flex flex-row justify-between gap-14">
         <button
           className="btn btn-ghost text-white font-bold rounded"
