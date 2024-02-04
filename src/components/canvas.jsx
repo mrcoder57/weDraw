@@ -20,9 +20,10 @@ function CanvasArea() {
   const isDrawing = useRef(false);
 
   const handleResize = () => {
-    setStageWidth(window.innerWidth);
-    setStageHeight(window.innerHeight);
-  };
+    setStageWidth(window.innerWidth );
+    setStageHeight(window.innerHeight - 50); 
+  }
+  
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
