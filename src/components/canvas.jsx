@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Editor, EditorState } from "draft-js";
 import { SketchPicker } from "react-color";
-import CanvasDraw from "react-canvas-draw";
-import rough from "roughjs/bin/rough";
+import { Stage, Layer, Circle } from "react-konva";
+
 
 import circle from "../assets/circle.svg";
 import colour from "../assets/color.svg";
 import closeIcon from "../assets/close.svg";
+import eraser from "../assets/eraser.svg";
 
-import eraser from "../assets/eraser.svg"
 function CanvasArea() {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -16,8 +16,8 @@ function CanvasArea() {
   const [stageWidth, setStageWidth] = useState(window.innerWidth);
   const [stageHeight, setStageHeight] = useState(window.innerHeight);
   const [color, setColor] = useState("#000000");
-  const canvasRef = useRef(null);
   const [showColor, setShowColor] = useState(false);
+  const [circles, setCircles] = useState([]);
 
   const handleResize = () => {
     setStageWidth(window.innerWidth);
@@ -32,15 +32,18 @@ function CanvasArea() {
   }, []);
 
   const clearCanvas = () => {
-    canvasRef.current.clear();
+    setCircles([]);
   };
+
   const drawCircle = () => {
-    const canvasDraw = canvasRef.current;
-    canvasDraw.brushRadius = 50;
-    canvasDraw.brushColor = color;
-   };
-   
-  
+    const newCircle = {
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      radius: 50,
+      color: '#000000',
+    };
+    setCircles([...circles, newCircle]);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -69,9 +72,9 @@ function CanvasArea() {
           <div className="bg-white p-6 rounded-md">
             <button
               className="absolute top-2 right-2 text-red-500"
-              onClick={()=>setShowColor(!showColor)}
+              onClick={() => setShowColor(!showColor)}
             >
-              <img src={closeIcon} alt="" className=" h-16 w-16"/>
+              <img src={closeIcon} alt="" className=" h-16 w-16" />
             </button>
             <SketchPicker
               color={color}
@@ -89,16 +92,19 @@ function CanvasArea() {
         className="mt-4 p-2 border border-gray-300"
       />
 
-      <CanvasDraw
-        ref={canvasRef}
-        canvasWidth={stageWidth}
-        canvasHeight={stageHeight}
-        brushColor={color}
-        lazyRadius={0}
-        brushRadius={3}
-        hideGrid
-        className="mt-4 border border-gray-300"
-      />
+      <Stage width={stageWidth} height={stageHeight}>
+        <Layer>
+          {circles.map((circle, i) => (
+            <Circle
+              key={i}
+              x={Math.random() * stageWidth}
+              y={Math.random() * stageHeight}
+              radius={50}
+              fill={circle.color}
+            />
+          ))}
+        </Layer>
+      </Stage>
     </div>
   );
 }
