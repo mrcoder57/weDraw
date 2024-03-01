@@ -55,7 +55,7 @@ function CanvasArea() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen fixed">
+    <div className="flex flex-col items-center justify-center min-h-screen lg:fixed">
       <div className="flex flex-row justify-between gap-14">
         <button
           className="btn btn-ghost text-white font-bold rounded"
